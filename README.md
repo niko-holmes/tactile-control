@@ -19,7 +19,7 @@ Ensure the Arduino board is connected via USB and the proper port is selected in
 Run the code
 
 ## Gripper Behaviour
---
+{TEXT}
 
 ## NED Test cases
 These test cases are desinged to be run using a Niryo NED robotic gripper. A description of each test is given below.
@@ -41,4 +41,4 @@ To run a test case simply uload the desired `.xml` to the NED and start it using
 5. Arm returns to start position and gripper disengages
 
 ### Test Case 3
---
+{TEXT}
