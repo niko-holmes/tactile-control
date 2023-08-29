@@ -16,6 +16,11 @@ Ensure the Arduino board is connected via USB and the proper port is selected in
 
 <img src="./images/port_selection.png" alt="Arduino Port Selection">
 
+Run the code
+
+##Gripper Behaviour
+--
+
 ## NED Test cases
 These test cases are desinged to be run using a Niryo NED robotic gripper. A description of each test is given below.
 
