@@ -18,7 +18,7 @@ Ensure the Arduino board is connected via USB and the proper port is selected in
 
 Run the code
 
-##Gripper Behaviour
+## Gripper Behaviour
 --
 
 ## NED Test cases
