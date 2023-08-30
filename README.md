@@ -14,8 +14,6 @@ This will also open all `.h` and `.cpp` files in the `./tactile_control` directo
 
 Ensure the Arduino board is connected via USB and the proper port is selected in the IDE.
 
-<img src="./images/port_selection.png" alt="Arduino Port Selection">
-
 Run the code
 
 ## Gripper Behaviour
