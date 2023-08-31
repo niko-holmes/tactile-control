@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "ServoBD.h"
 
-ServoBD::ServoBD(int rpm, byte pin_f, byte pin_b){
+ServoBD::ServoBD(byte pin_f, byte pin_b){
   this->pin_f = pin_f;
   this->pin_b = pin_b;
   init();

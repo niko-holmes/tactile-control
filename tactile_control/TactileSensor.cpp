@@ -1,20 +1,21 @@
+#include "HardwareSerial.h"
 #include "Arduino.h"
 #include "TactileSensor.h"
 #include "vector3.h"
 
-TactileSensor::TactileSensor(byte sensor_address1, byte sensor_address2, byte sensor_address3, byte sensor_address4){
-  addresses[0] = sensor_address1;
-  addresses[1] = sensor_address2;
-  addresses[2] = sensor_address3;
-  addresses[3] = sensor_address4;
-
-  init();
+TactileSensor::TactileSensor(byte mplxr_pin){
+  this->mplxr_pin = mplxr_pin;
 }
 
-void TactileSensor::init(){
+void TactileSensor::init(){  
+  Serial.print("Calibrating sensor chips: ");
   for(int i = 0; i < 4; i++){
+    Serial.print(" ");
+    Serial.print(i+1);
     sensors[i].calibrate();
   }
+
+  Serial.println();
 }
 
 vector3_double TactileSensor::readData(){
@@ -36,6 +37,8 @@ vector3_double TactileSensor::readData(){
     xReadings[i] = raw_data.x;
     yReadings[i] = raw_data.y;
     zReadings[i] = raw_data.z;
+
+    //ADD DELAY??
   }
 
   //Average readings of all 4 Hall-effect sensors

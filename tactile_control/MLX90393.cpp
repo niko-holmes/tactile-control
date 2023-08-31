@@ -4,23 +4,6 @@
 
 MLX90393::MLX90393(byte address){
   this->address = address;
-  init();
-}
-
-void MLX90393::init(){
-  //Initiate I2C communication and send RESET command to sensor
-  Wire.beginTransmission(address);
-  Wire.write(0xF0); //RT command
-  Wire.endTransmission();
-  
-  //Request status byte from sensor
-  Wire.requestFrom(address, byte(1));
-
-  if(Wire.available() == 1){
-    byte status_byte = Wire.read();
-    //Serial.print("Status Byte: ");
-    //print8bitBinary(status_byte);
-  }
 }
 
 void MLX90393::calibrate(){
@@ -35,12 +18,22 @@ void MLX90393::calibrate(){
   //Measure in all axes, XYZ.
   Wire.beginTransmission(address);
   Wire.write(0x3E); //SMxyz command
-  Wire.endTransmission();
+  int c = Wire.endTransmission();
+
+  if(c != 0){
+    Serial.print("Cal. SMxyz Transmission Failed, error: ");
+    Serial.println(c);
+  }
 
   Wire.requestFrom(address, byte(1));
 
   if(Wire.available() == 1){
     byte status_byte = Wire.read();
+
+    //Check for error bit in status byte
+    if(status_byte & 0b00010000){
+      Serial.print("Error in calibration SMxyz");
+    }
   }
 
   delay(100);
@@ -48,7 +41,12 @@ void MLX90393::calibrate(){
   //Send read measurement command to sensor. Measure all axes XYZ
   Wire.beginTransmission(address);
   Wire.write(0x4E); //RMxyz command
-  Wire.endTransmission();
+  c = Wire.endTransmission();
+
+  if(c != 0){
+    Serial.print("Cal. RMxyz Transmission Failed, error: ");
+    Serial.println(c);
+  }
 
   //7 bytes: status, xMSB, xLSB, yMSB, yLSB, zMSB, zLSB
   Wire.requestFrom(address, byte(7));
@@ -58,6 +56,11 @@ void MLX90393::calibrate(){
     for(int i = 0;  i < 7; i++){
       readings[i] = Wire.read();
     }
+  }
+
+  //Check for error bit in status byte
+  if(readings[0] & 0b00010000){
+    Serial.print("Error in calibration RMxyz");
   }
 
   //Combine MSB and LSB bytes for each axis reading.
@@ -76,19 +79,34 @@ vector3 MLX90393::read(){
 
   Wire.beginTransmission(address);
   Wire.write(0x3E); //SMxyz command
-  Wire.endTransmission();
+  int c = Wire.endTransmission();
+
+  if(c != 0){
+    Serial.print("Read SMxyz Transmission Failed, error: ");
+    Serial.println(c);
+  }
 
   Wire.requestFrom(address, byte(1));
 
   if(Wire.available() == 1){
     byte status_byte = Wire.read();
+
+    //Check for error bit in status byte
+    if(status_byte & 0b00010000){
+      Serial.print("Error in measure SMxyz");
+    }
   }
 
   delay(100);
 
   Wire.beginTransmission(address);
   Wire.write(0x4E); //RMxyz command
-  Wire.endTransmission();
+  c = Wire.endTransmission();
+
+  if(c != 0){
+    Serial.print("Read RMxyz Transmission Failed, error: ");
+    Serial.println(c);
+  }
 
   //7 bytes: status, xMSB, xLSB, yMSB, yLSB, zMSB, zLSB
   Wire.requestFrom(address, byte(7));
@@ -99,9 +117,53 @@ vector3 MLX90393::read(){
     }
   }
 
+  //Check for error bit in status byte
+  if(readings[0] & 0b00010000){
+    Serial.print("Error in measure RMxyz");
+  }
+
   data.x = ((readings[1]<<8)|readings[2]) - xOffset;
   data.y = ((readings[3]<<8)|readings[4]) - yOffset;
   data.z = ((readings[5]<<8)|readings[6]) - zOffset;
 
   return data; 
+}
+
+void MLX90393::reset(){
+  /*Resets the sensor by sending exit (EX) command followed by reset (RT) command.
+  
+  :return: None
+  */
+  //Initiate I2C communication and send EXIT then RESET command to sensor
+  Wire.beginTransmission(address);
+  Wire.write(0x80); //EX command
+  int c = Wire.endTransmission();
+  if(c != 0){
+    Serial.print("EX Transmission Failed, error: ");
+    Serial.println(c);
+  }
+
+  delay(1);
+  
+  Wire.beginTransmission(address);
+  Wire.write(0xF0); //RT command
+  c = Wire.endTransmission();
+  
+  if(c != 0){
+    Serial.print("RT Transmission Failed, error: ");
+    Serial.println(c);
+  }
+
+  //Request status byte from sensor
+  Wire.requestFrom(address, byte(1));
+
+  if(Wire.available() == 1){
+    byte status_byte = Wire.read();
+    //Check for error bit in status byte
+    if(status_byte & 0b00010000){
+      Serial.print("Error in RT");
+    }
+  }
+
+  delay(2);
 }
