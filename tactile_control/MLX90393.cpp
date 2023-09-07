@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #include "Arduino.h"
 #include "MLX90393.h"
 #include "vector3.h"
@@ -7,11 +8,12 @@ MLX90393::MLX90393(byte address){
 }
 
 void MLX90393::calibrate(){
-  /*Calibrate the sensor by taking the first measured XYZ values
+  /*Calibrate the sensor by taking the average of the first 10 measured XYZ values
   as the XYZ offsets.
 
   :return: None
   */
+
   byte readings[7];
 
   //Start sensor in single measurment mode by sending SM command.
