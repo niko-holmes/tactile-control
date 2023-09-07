@@ -16,8 +16,7 @@ Ensure the Arduino board is connected via USB and the proper port is selected in
 
 Run the code
 
-## Gripper Behaviour
-{TEXT}
+(All output is given through the Arduino serial monitor)
 
 ## NED Test cases
 These test cases are desinged to be run using a Niryo NED robotic gripper. A description of each test is given below.
