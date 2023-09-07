@@ -6,7 +6,7 @@ Developed for Master Thesis at Queen Mary University of London, August 2023
 ## Setup for Arduino
 Set up Arduino UNO, sensors, and ICs as shown in the circuit diagram below.
 
-<img src="./images/circuit_diagram.png" alt="Circuit Diagram" />
+<img src="./circuit_diagram.png" alt="Circuit Diagram" />
 
 Open `tactile_control.ino` file within Arduino IDE.
 
