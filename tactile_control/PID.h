@@ -8,11 +8,11 @@ class PID{
   private:
     int Kp, Ki, Kd;
 
-    double cumulative_error;
-    double error_rate;
+    double cumulativeError;
+    double errorRate;
 
-    unsigned long start_time;
-    double last_error;
+    unsigned long startTime;
+    double lastError;
   
   public:
     PID(int Kp, int Ki, int Kd);
