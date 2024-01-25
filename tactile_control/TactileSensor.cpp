@@ -14,7 +14,12 @@ void TactileSensor::init(){
   }
 }
 
-void TactileSensor::calibrate(int nSamples){  
+void TactileSensor::calibrate(int nSamples){
+  /*Call calibrate method in all 4 MLX90393 chips.
+
+  :param nSamples: Number of samples to be taken when calculating zero offset
+  :returns: None
+  */
   Serial.print("Calibrating sensor chips: ");
   for(int i = 0; i < 4; i++){
     Serial.print(" ");
@@ -31,7 +36,7 @@ vector3Double TactileSensor::readData(){
   Calculate data average for X, Y, and Z measurements.
   Return filtered data vector.
 
-  :return: filtered data vector
+  :returns: filtered data vector
   */
 
   int xReadings[4];
