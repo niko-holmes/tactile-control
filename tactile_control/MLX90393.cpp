@@ -8,15 +8,15 @@ MLX90393::MLX90393(byte address){
 }
 
 void MLX90393::init(){
-  this->xOffset = 0;
-  this->yOffset = 0;
-  this->zOffset = 0;
+  xOffset = 0;
+  yOffset = 0;
+  zOffset = 0;
 }
 
 vector3 MLX90393::read(){
   /*Read sensor data. Must be called after calibrate() for accurate measurements.
 
-  :returns: vector of measured data in X,Y,Z axes.
+  :return: vector of measured data in X,Y,Z axes.
   */
   byte readings[7];
   vector3 data;
@@ -77,30 +77,28 @@ void MLX90393::calibrate(int nSamples){
   /*Calibrate the sensor by taking the average of the first nSamples measured
   as the XYZ offsets.
 
-  :param nSamples: Number of samples taken to find zero offset
-  :returns: None
+  :nSamples: Number of samples taken to find zero offset
+  :return  : None
   */
-  long long int xSum = 0;
-  long long int ySum = 0;
-  long long int zSum = 0;
+  init();
   
   for(int i=0; i < nSamples; i++){
     vector3 data = read();
-    xSum += data.x;
-    ySum += data.y;
-    zSum += data.z;
+    xOffset += data.x;
+    yOffset += data.y;
+    zOffset += data.z;
   }
 
-  xOffset = xSum / nSamples;
-  yOffset = ySum / nSamples;
-  zOffset = zSum / nSamples;
+  xOffset /= nSamples;
+  yOffset /= nSamples;
+  zOffset /= nSamples;
 
   }
 
 void MLX90393::reset(){
   /*Resets the sensor by sending exit (EX) command followed by reset (RT) command.
   
-  :returns: None
+  :return: None
   */
   //Initiate I2C communication and send EXIT then RESET command to sensor
   Wire.beginTransmission(address);
@@ -137,10 +135,6 @@ void MLX90393::reset(){
 }
 
 String MLX90393::str(){
-  /*Returns a string of sensor information. Includes sensor I2C address and X,Y,Z calibration offsets.
-
-  :returns: String 
-  */
   return "Adr: " + String(address, BIN) + 
     "\nOffsets: " + String(xOffset) + ", " + String(yOffset) + ", " + String(zOffset);
 }

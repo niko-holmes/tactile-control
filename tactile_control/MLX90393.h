@@ -7,10 +7,10 @@
 
 class MLX90393{
   private:
-    byte address;
-    int xOffset;
-    int yOffset;
-    int zOffset;
+    byte adr;
+    long int xOffset;
+    long int yOffset;
+    long int zOffset;
   
   public:
     MLX90393(byte address);
