@@ -14,9 +14,11 @@ class MLX90393{
   
   public:
     MLX90393(byte address);
-    void calibrate();
+    void init();
     vector3 read();
+    void calibrate(int nSamples);
     void reset();
+    String str();
 };
 
 #endif

@@ -7,68 +7,10 @@ MLX90393::MLX90393(byte address){
   this->address = address;
 }
 
-void MLX90393::calibrate(){
-  /*Calibrate the sensor by taking the average of the first 10 measured XYZ values
-  as the XYZ offsets.
-
-  :return: None
-  */
-
-  byte readings[7];
-
-  //Start sensor in single measurment mode by sending SM command.
-  //Measure in all axes, XYZ.
-  Wire.beginTransmission(address);
-  Wire.write(0x3E); //SMxyz command
-  int c = Wire.endTransmission();
-
-  if(c != 0){
-    Serial.print("Cal. SMxyz Transmission Failed, error: ");
-    Serial.println(c);
-  }
-
-  Wire.requestFrom(address, byte(1));
-
-  if(Wire.available() == 1){
-    byte status_byte = Wire.read();
-
-    //Check for error bit in status byte
-    if(status_byte & 0b00010000){
-      Serial.print("Error in calibration SMxyz");
-    }
-  }
-
-  delay(100);
-
-  //Send read measurement command to sensor. Measure all axes XYZ
-  Wire.beginTransmission(address);
-  Wire.write(0x4E); //RMxyz command
-  c = Wire.endTransmission();
-
-  if(c != 0){
-    Serial.print("Cal. RMxyz Transmission Failed, error: ");
-    Serial.println(c);
-  }
-
-  //7 bytes: status, xMSB, xLSB, yMSB, yLSB, zMSB, zLSB
-  Wire.requestFrom(address, byte(7));
-
-  //Read all 7 bytes of data. Bytes 1 to 7 are measurement data  
-  if(Wire.available() == 7){
-    for(int i = 0;  i < 7; i++){
-      readings[i] = Wire.read();
-    }
-  }
-
-  //Check for error bit in status byte
-  if(readings[0] & 0b00010000){
-    Serial.print("Error in calibration RMxyz");
-  }
-
-  //Combine MSB and LSB bytes for each axis reading.
-  xOffset = int((readings[1]<<8)|readings[2]);
-  yOffset = int((readings[3]<<8)|readings[4]);
-  zOffset = int((readings[5]<<8)|readings[6]);
+void MLX90393::init(){
+  this->xOffset = 0;
+  this->yOffset = 0;
+  this->zOffset = 0;
 }
 
 vector3 MLX90393::read(){
@@ -91,15 +33,15 @@ vector3 MLX90393::read(){
   Wire.requestFrom(address, byte(1));
 
   if(Wire.available() == 1){
-    byte status_byte = Wire.read();
+    byte statusByte = Wire.read();
 
     //Check for error bit in status byte
-    if(status_byte & 0b00010000){
+    if(statusByte & 0b00010000){
       Serial.print("Error in measure SMxyz");
     }
   }
 
-  delay(100);
+  delay(15);
 
   Wire.beginTransmission(address);
   Wire.write(0x4E); //RMxyz command
@@ -131,6 +73,30 @@ vector3 MLX90393::read(){
   return data; 
 }
 
+void MLX90393::calibrate(int nSamples){
+  /*Calibrate the sensor by taking the average of the first nSamples measured
+  as the XYZ offsets.
+
+  :nSamples: Number of samples taken to find zero offset
+  :return  : None
+  */
+  long long int xSum = 0;
+  long long int ySum = 0;
+  long long int zSum = 0;
+  
+  for(int i=0; i < nSamples; i++){
+    vector3 data = read();
+    xSum += data.x;
+    ySum += data.y;
+    zSum += data.z;
+  }
+
+  xOffset = xSum / nSamples;
+  yOffset = ySum / nSamples;
+  zOffset = zSum / nSamples;
+
+  }
+
 void MLX90393::reset(){
   /*Resets the sensor by sending exit (EX) command followed by reset (RT) command.
   
@@ -160,12 +126,17 @@ void MLX90393::reset(){
   Wire.requestFrom(address, byte(1));
 
   if(Wire.available() == 1){
-    byte status_byte = Wire.read();
+    byte statusByte = Wire.read();
     //Check for error bit in status byte
-    if(status_byte & 0b00010000){
+    if(statusByte & 0b00010000){
       Serial.print("Error in RT");
     }
   }
 
   delay(2);
+}
+
+String MLX90393::str(){
+  return "Adr: " + String(address, BIN) + 
+    "\nOffsets: " + String(xOffset) + ", " + String(yOffset) + ", " + String(zOffset);
 }
