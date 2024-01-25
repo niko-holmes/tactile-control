@@ -3,23 +3,30 @@
 #include "TactileSensor.h"
 #include "vector3.h"
 
-TactileSensor::TactileSensor(byte mplxr_pin){
-  this->mplxr_pin = mplxr_pin;
+TactileSensor::TactileSensor(byte mplxrPin){
+  this->mplxrPin = mplxrPin;
 
 }
 
 void TactileSensor::init(){  
+  for(int i = 0; i < 4; i++){
+    sensors[i].init();
+  }
+}
+
+void TactileSensor::calibrate(int nSamples){  
   Serial.print("Calibrating sensor chips: ");
   for(int i = 0; i < 4; i++){
     Serial.print(" ");
     Serial.print(i+1);
-    sensors[i].calibrate();
+    sensors[i].init();
+    sensors[i].calibrate(nSamples);
   }
 
   Serial.println();
 }
 
-vector3_double TactileSensor::readData(){
+vector3Double TactileSensor::readData(){
   /*Read measurement data of the 4 attached MLX90393 chips.
   Calculate data average for X, Y, and Z measurements.
   Return filtered data vector.
@@ -32,22 +39,18 @@ vector3_double TactileSensor::readData(){
   int zReadings[4];
 
   for(int i = 0; i < 4; i++){
-    vector3 raw_data = sensors[i].read();
+    vector3 rawData = sensors[i].read();
 
-    xReadings[i] = raw_data.x;
-    yReadings[i] = raw_data.y;
-    zReadings[i] = raw_data.z;
+    xReadings[i] = rawData.x;
+    yReadings[i] = rawData.y;
+    zReadings[i] = rawData.z;
   }
 
   //Average readings of all 4 Hall-effect sensors
-  vector3_double reading_avg;
-  /*reading_avg.x = max(max(xReadings[0], xReadings[1]), max(xReadings[2], xReadings[3]));
-  reading_avg.y = max(max(yReadings[0], yReadings[1]), max(yReadings[2], yReadings[3]));
-  reading_avg.z = max(max(zReadings[0], zReadings[1]), max(zReadings[2], zReadings[3]));*/
+  vector3Double readingAvg;
+  readingAvg.x = (xReadings[0] + xReadings[1] + xReadings[2] + xReadings[3]) / 4.0;
+  readingAvg.y = (yReadings[0] + yReadings[1] + yReadings[2] + yReadings[3]) / 4.0;
+  readingAvg.z = (zReadings[0] + zReadings[1] + zReadings[2] + zReadings[3]) / 4.0;
 
-  reading_avg.x = (xReadings[0] + xReadings[1] + xReadings[2] + xReadings[3]) / 4;
-  reading_avg.y = (yReadings[0] + yReadings[1] + yReadings[2] + yReadings[3]) / 4;
-  reading_avg.z = (zReadings[0] + zReadings[1] + zReadings[2] + zReadings[3]) / 4;
-
-  return reading_avg;
+  return readingAvg;
 }
