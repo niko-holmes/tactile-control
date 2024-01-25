@@ -5,7 +5,7 @@ struct vector3{
   int x, y, z;
 };
 
-struct vector3_double{
+struct vector3Double{
   double x, y, z;
 };
 
