@@ -12,14 +12,12 @@ class TactileSensor{
                            MLX90393(0b0001101),
                            MLX90393(0b0001110),
                            MLX90393(0b0001111)};
-
-    vector3 offset;
-
   public:
     TactileSensor(byte mplxrPin);
     void init();
     void calibrate(int nSamples);
     vector3Double readData();
+    String str();
 };
 
 #endif
