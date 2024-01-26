@@ -15,43 +15,76 @@ class vector3
     }
 
     //Binary Arithmetic Operators
-    vector3 operator+(const vector3& v){return vector3(x + v.x, y + v.y, z + v.z);}
+    vector3 operator+(const vector3& v)       {return vector3(x + v.x, y + v.y, z + v.z);}
+    vector3 operator+(const int& n)           {return vector3(x + n, y + n, z + n);}
+    vector3 operator+(const unsigned int& n)  {return vector3(x + n, y + n, z + n);}
+    vector3 operator+(const long& n)          {return vector3(x + n, y + n, z + n);}
+    vector3 operator+(const unsigned long& n) {return vector3(x + n, y + n, z + n);}
+    vector3 operator+(const double& n)        {return vector3(x + n, y + n, z + n);}
+
     vector3 operator-(const vector3& v){return vector3(x - v.x, y - v.y, z - v.z);}
+    vector3 operator-(const int& n)           {return vector3(x - n, y - n, z - n);}
+    vector3 operator-(const unsigned int& n)  {return vector3(x - n, y - n, z - n);}
+    vector3 operator-(const long& n)          {return vector3(x - n, y - n, z - n);}
+    vector3 operator-(const unsigned long& n) {return vector3(x - n, y - n, z - n);}
+    vector3 operator-(const double& n)        {return vector3(x - n, y - n, z - n);}
+
     vector3 operator*(const vector3& v){return vector3(x * v.x, y * v.y, z * v.z);}
+    vector3 operator*(const int& n)           {return vector3(x * n, y * n, z * n);}
+    vector3 operator*(const unsigned int& n)  {return vector3(x * n, y * n, z * n);}
+    vector3 operator*(const long& n)          {return vector3(x * n, y * n, z * n);}
+    vector3 operator*(const unsigned long& n) {return vector3(x * n, y * n, z * n);}
+    vector3 operator*(const double& n)        {return vector3(x * n, y * n, z * n);}
+
     vector3 operator/(const vector3& v){return vector3(x / v.x, y / v.y, z / v.z);}
+    vector3 operator/(const int& n)           {return vector3(x / n, y / n, z / n);}
+    vector3 operator/(const unsigned int& n)  {return vector3(x / n, y / n, z / n);}
+    vector3 operator/(const long& n)          {return vector3(x / n, y / n, z / n);}
+    vector3 operator/(const unsigned long& n) {return vector3(x / n, y / n, z / n);}
+    vector3 operator/(const double& n)        {return vector3(x / n, y / n, z / n);}
+
     vector3 operator%(const vector3& v){return vector3(x % v.x, y % v.y, z % v.z);}
+    vector3 operator%(const int& n)           {return vector3(x % n, y % n, z % n);}
+    vector3 operator%(const unsigned int& n)  {return vector3(x % n, y % n, z % n);}
+    vector3 operator%(const long& n)          {return vector3(x % n, y % n, z % n);}
+    vector3 operator%(const unsigned long& n) {return vector3(x % n, y % n, z % n);}
+    vector3 operator%(const double& n)        {return vector3(x % n, y % n, z % n);}
 
     //Assignment Operators
-    vector3& operator+=(const vector3& v){
-      x += v.x;
-      y += v.y;
-      z += v.z;
-      return *this;
-    }
-    vector3& operator-=(const vector3& v){
-      x -= v.x;
-      y -= v.y;
-      z -= v.z;
-      return *this;
-    }
-    vector3& operator*=(const vector3& v){
-      x *= v.x;
-      y *= v.y;
-      z *= v.z;
-      return *this;
-    }
-    vector3& operator/=(const vector3& v){
-      x /= v.x;
-      y /= v.y;
-      z /= v.z;
-      return *this;
-    }
-    vector3& operator%=(const vector3& v){
-      x %= v.x;
-      y %= v.y;
-      z %= v.z;
-      return *this;
-    }
+    vector3& operator+=(const vector3& v)       {x += v.x; y += v.y; z += v.z; return *this;}
+    vector3& operator+=(const int& n)           {x += n; y += n; z += n; return *this;}
+    vector3& operator+=(const unsigned int& n)  {x += n; y += n; z += n; return *this;}
+    vector3& operator+=(const long& n)          {x += n; y += n; z += n; return *this;}
+    vector3& operator+=(const unsigned long& n) {x += n; y += n; z += n; return *this;}
+    vector3& operator+=(const double& n)        {x += n; y += n; z += n; return *this;}
+
+    vector3& operator-=(const vector3& v)       {x -= v.x; y -= v.y; z -= v.z; return *this;}
+    vector3& operator-=(const int& n)           {x -= n; y -= n; z -= n; return *this;}
+    vector3& operator-=(const unsigned int& n)  {x -= n; y -= n; z -= n; return *this;}
+    vector3& operator-=(const long& n)          {x -= n; y -= n; z -= n; return *this;}
+    vector3& operator-=(const unsigned long& n) {x -= n; y -= n; z -= n; return *this;}
+    vector3& operator-=(const double& n)        {x -= n; y -= n; z -= n; return *this;}
+
+    vector3& operator*=(const vector3& v)       {x *= v.x; y *= v.y; z *= v.z; return *this;}
+    vector3& operator*=(const int& n)           {x *= n; y *= n; z *= n; return *this;}
+    vector3& operator*=(const unsigned int& n)  {x *= n; y *= n; z *= n; return *this;}
+    vector3& operator*=(const long& n)          {x *= n; y *= n; z *= n; return *this;}
+    vector3& operator*=(const unsigned long& n) {x *= n; y *= n; z *= n; return *this;}
+    vector3& operator*=(const double& n)        {x *= n; y *= n; z *= n; return *this;}
+
+    vector3& operator/=(const vector3& v)       {x /= v.x; y /= v.y; z /= v.z; return *this;}
+    vector3& operator/=(const int& n)           {x /= n; y /= n; z /= n; return *this;}
+    vector3& operator/=(const unsigned int& n)  {x /= n; y /= n; z /= n; return *this;}
+    vector3& operator/=(const long& n)          {x /= n; y /= n; z /= n; return *this;}
+    vector3& operator/=(const unsigned long& n) {x /= n; y /= n; z /= n; return *this;}
+    vector3& operator/=(const double& n)        {x /= n; y /= n; z /= n; return *this;}
+
+    vector3& operator%=(const vector3& v)       {x %= v.x; y %= v.y; z %= v.z; return *this;}
+    vector3& operator%=(const int& n)           {x %= n; y %= n; z %= n; return *this;}
+    vector3& operator%=(const unsigned int& n)  {x %= n; y %= n; z %= n; return *this;}
+    vector3& operator%=(const long& n)          {x %= n; y %= n; z %= n; return *this;}
+    vector3& operator%=(const unsigned long& n) {x %= n; y %= n; z %= n; return *this;}
+    vector3& operator%=(const double& n)        {x %= n; y %= n; z %= n; return *this;}
 
     String str(){
       return String(String(x) + "," + String(y) + "," + String(z));
