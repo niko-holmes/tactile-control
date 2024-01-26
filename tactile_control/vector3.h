@@ -1,36 +1,60 @@
 #ifndef vector3_h
 #define vector3_h
 
-struct vector3{
-  int x,y,z;
+template <typename T>
+class vector3
+{
+  public:
+    T x, y, z;
 
-  vector3(int x, int y, int z);
+    //Constructors
+    vector3(T x = 0, T y = 0, T z = 0){
+      this->x = x;
+      this->y = y;
+      this->z = z;
+    }
 
-  //Binary Arithmetic Operators
-  vector3 operator+(const vector3& v);
-  vector3 operator-(const vector3& v);
-  vector3 operator*(const vector3& v);
-  vector3 operator/(const vector3& v);
-  vector3 operator%(const vector3& v);
+    //Binary Arithmetic Operators
+    vector3 operator+(const vector3& v){return vector3(x + v.x, y + v.y, z + v.z);}
+    vector3 operator-(const vector3& v){return vector3(x - v.x, y - v.y, z - v.z);}
+    vector3 operator*(const vector3& v){return vector3(x * v.x, y * v.y, z * v.z);}
+    vector3 operator/(const vector3& v){return vector3(x / v.x, y / v.y, z / v.z);}
+    vector3 operator%(const vector3& v){return vector3(x % v.x, y % v.y, z % v.z);}
 
-  //Assignment Operators
-  vector3& operator+=(const vector3& v);
-  vector3& operator-=(const vector3& v);
-  vector3& operator*=(const vector3& v);
-  vector3& operator/=(const vector3& v);
-  vector3& operator%=(const vector3& v);
+    //Assignment Operators
+    vector3& operator+=(const vector3& v){
+      x += v.x;
+      y += v.y;
+      z += v.z;
+      return *this;
+    }
+    vector3& operator-=(const vector3& v){
+      x -= v.x;
+      y -= v.y;
+      z -= v.z;
+      return *this;
+    }
+    vector3& operator*=(const vector3& v){
+      x *= v.x;
+      y *= v.y;
+      z *= v.z;
+      return *this;
+    }
+    vector3& operator/=(const vector3& v){
+      x /= v.x;
+      y /= v.y;
+      z /= v.z;
+      return *this;
+    }
+    vector3& operator%=(const vector3& v){
+      x %= v.x;
+      y %= v.y;
+      z %= v.z;
+      return *this;
+    }
 
-  //Unary Arithmetic Operators
-  vector3& operator++();    //Prefix
-  vector3 operator++(int);  //Postfix
-  vector3& operator--();    //Prefix
-  vector3 operator--(int);  //Postfix
-
-  void print();
+    String str(){
+      return String(String(x) + "," + String(y) + "," + String(z));
+    }
 };
-
-struct vector3Double{
-  double x, y, z;
-};
-
 #endif
