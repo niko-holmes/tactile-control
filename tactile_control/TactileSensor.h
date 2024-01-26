@@ -16,7 +16,7 @@ class TactileSensor{
     TactileSensor(byte mplxrPin);
     void init();
     void calibrate(int nSamples);
-    vector3Double readData();
+    vector3<long> readData();
     String str();
 };
 

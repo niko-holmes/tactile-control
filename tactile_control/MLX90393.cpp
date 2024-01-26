@@ -8,18 +8,15 @@ MLX90393::MLX90393(byte address){
 }
 
 void MLX90393::init(){
-  xOffset = 0;
-  yOffset = 0;
-  zOffset = 0;
+  zeroOffset *= 0;
 }
 
-vector3 MLX90393::read(){
+vector3<long> MLX90393::read(){
   /*Read sensor data. Must be called after calibrate() for accurate measurements.
 
   :return: vector of measured data in X,Y,Z axes.
   */
   byte readings[7];
-  vector3 data;
 
   Wire.beginTransmission(address);
   Wire.write(0x3E); //SMxyz command
@@ -66,11 +63,11 @@ vector3 MLX90393::read(){
     Serial.print("Error in measure RMxyz");
   }
 
-  data.x = ((readings[1]<<8)|readings[2]) - xOffset;
-  data.y = ((readings[3]<<8)|readings[4]) - yOffset;
-  data.z = ((readings[5]<<8)|readings[6]) - zOffset;
+  vector3<long> data(((readings[1]<<8)|readings[2]),
+                    ((readings[3]<<8)|readings[4]),
+                    ((readings[5]<<8)|readings[6]));
 
-  return data; 
+  return data - zeroOffset; 
 }
 
 void MLX90393::calibrate(int nSamples){
@@ -81,19 +78,15 @@ void MLX90393::calibrate(int nSamples){
   :return  : None
   */
   init();
+  vector3<long> newOffset;
   
   for(int i=0; i < nSamples; i++){
-    vector3 data = read();
-    xOffset += data.x;
-    yOffset += data.y;
-    zOffset += data.z;
+    vector3<long> d = read();
+    newOffset += d;
   }
-
-  xOffset /= nSamples;
-  yOffset /= nSamples;
-  zOffset /= nSamples;
-
-  }
+  
+  zeroOffset = (newOffset / nSamples);
+}
 
 void MLX90393::reset(){
   /*Resets the sensor by sending exit (EX) command followed by reset (RT) command.
@@ -134,7 +127,7 @@ void MLX90393::reset(){
   delay(2);
 }
 
-String MLX90393::str(){
-  return "Adr: " + String(address, BIN) + 
-    "\nOffsets: " + String(xOffset) + ", " + String(yOffset) + ", " + String(zOffset);
+void MLX90393::print(){
+  Serial.println("Adr: " + String(address, BIN));
+  Serial.print("Offsets: " + zeroOffset.str());
 }

@@ -30,29 +30,20 @@ void TactileSensor::calibrate(int nSamples){
   Serial.println();
 }
 
-vector3Double TactileSensor::readData(){
+vector3<long> TactileSensor::readData(){
   /*Read measurement data of the 4 attached MLX90393 chips.
   Calculate data average for X, Y, and Z measurements.
   Return averaged data vector.
 
   :returns: averaged data vector
   */
-  vector3Double readingAvg;
+  vector3<long> readingAvg;
 
   for(int i = 0; i < 4; i++){
-    vector3 rawData = sensors[i].read();
-
-    readingAvg.x += rawData.x;
-    readingAvg.y += rawData.y;
-    readingAvg.z += rawData.z;
+    readingAvg += sensors[i].read();
   }
 
-  //Average readings of all 4 Hall-effect sensors
-  readingAvg.x /= 4.0;
-  readingAvg.y /= 4.0;
-  readingAvg.z /= 4.0;
-
-  return readingAvg;
+  return readingAvg / 4;
 }
 
 String TactileSensor::str(){

@@ -8,17 +8,15 @@
 class MLX90393{
   private:
     byte address;
-    long int xOffset;
-    long int yOffset;
-    long int zOffset;
+    vector3<long> zeroOffset;
   
   public:
     MLX90393(byte address);
     void init();
-    vector3 read();
+    vector3<long> read();
     void calibrate(int nSamples);
     void reset();
-    String str();
+    void print();
 };
 
 #endif
