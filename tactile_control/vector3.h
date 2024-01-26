@@ -29,4 +29,8 @@ struct vector3{
   void print();
 };
 
+struct vector3Double{
+  double x, y, z;
+};
+
 #endif
