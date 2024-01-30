@@ -1,7 +1,7 @@
 #include "ServoBD.h"
 #include "PID.h"
 #include "TactileSensor.h"
-#include <Wire.h>
+#include "Wire.h"
 #include "vector3.h"
 
 //Servo
@@ -15,12 +15,12 @@ TactileSensor finger1(1);
 //TactileSensor finger2(2);
 //TactileSensor finger3(2);
 
-double Fz_target = 1.50;     //Target Z force [N]
-int sampling_time = 100;     //Sampling time [ms]
-int ut_max;
+double fzTarget = 1.50;     //Target Z force [N]
+int samplingTime = 100;     //Sampling time [ms]
+int utMax;
 
-uint8_t duty_cycle_max = 255;
-uint8_t duty_cycle_min = 200;
+int dutyCycleMax = 255;
+int dutyCycleMin = 200;
 
 void setup(){
   pinMode(9, INPUT_PULLUP);   //Set PIN09 to input. PIN09 for NED input
@@ -32,7 +32,7 @@ void setup(){
   
   delay(100);
 
-  ut_max = pid.calculate(Fz_target, 0);
+  utMax = pid.calculate(fzTarget, 0);
 
   //Initialize finger objects
   Serial.println("Initializing Fingers");
@@ -70,110 +70,99 @@ void loop(){
 
   :return: None
   */
-
-  //If the button connected to pin 10 is pressed OR the NED sends a signal to pin 9, the servo will be reset and the control loop will stop
-  /*if(digitalRead(10) == LOW || digitalRead(9) == HIGH){ 
-    Serial.println("STOPPING SYSTEM");
-    Serial.println("Press Arduino Reset button to restart system");
-    return;
-  }*/
-
+  
   //Read sensor data and return vector of largest force in each axis
-  vector3_double max_force = readSensors();
+  vector3<long> maxForce = readSensors();
 
   //Calculate control output
-  int ut = pid.calculate(Fz_target, max_force.z);  
-  
-  uint8_t duty_cycle = uint8_t((((abs(ut) - 0)*(duty_cycle_max - duty_cycle_min)) / (ut_max - 0)) + duty_cycle_min); //Convert ut to duty cycle value range (200 to 255);
+  int ut = pid.calculate(fzTarget, maxForce.z);  
+  int dutyCycle = (((abs(ut) - 0)*(dutyCycleMax - dutyCycleMin)) / (utMax - 0)) + dutyCycleMin; //Convert ut to duty cycle value range (200 to 255);
 
   //Rotate servo
   if(ut > 0 && digitalRead(12) == HIGH){
     //Close Gripper
-    servo.backward(duty_cycle);
+    servo.pwm(-dutyCycle);
   }
   else{
-    servo.off();
+    servo.pwm(0);
   }
 
-  //Print force, u(t), and duty_cycle data
+  //Print force, u(t), and dutyCycle data
   /*Serial.print("xForce: ");
-  Serial.println(max_force.x);
+  Serial.println(maxForce.x);
   Serial.print("yForce: ");
-  Serial.println(max_force.y);*/
+  Serial.println(maxForce.y);*/
   //Serial.print("zForce: ");
-  Serial.println(max_force.z);
+  Serial.println(maxForce.z);
   //Serial.print("u(t): ");
   //Serial.println(ut);
   //Serial.print("duty cycle: ");
-  //Serial.println(duty_cycle);
+  //Serial.println(dutyCycle);
   //Serial.println();
 
-  delay(sampling_time);
+  delay(samplingTime);
 }
 
-vector3_double readSensors(){
+vector3<long> readSensors(){
   /*Call readSensor for each tactile sensor in the gripper.
   Calculate the maximum force measured in each axis.
   Return a vector of the max forces.
 
   :return: vector of maximum force in each axis.
   */
-  vector3_double max_force;
+  vector3<long> maxForce;
 
-  vector3_double finger1_force = finger1.readData();
-  /*vector3_double finger2_force = finger2.readData();
-  vector3_double finger3_force = finger3.readData();
+  vector3<long> finger1Force = finger1.readData();
+  /*vector3_double finger2Force = finger2.readData();
+  vector3_double finger3Force = finger3.readData();
 
   
-  max_force.x = max(finger1_force.x, finger2_force.x);
-  max_force.x = max(max_force.x, finger3_force.x);
+  maxForce.x = max(finger1Force.x, finger2Force.x);
+  maxForce.x = max(maxForce.x, finger3Force.x);
 
-  max_force.y = max(finger1_force.y, finger2_force.y);
-  max_force.y = max(max_force.y, finger3_force.y);
+  maxForce.y = max(finger1Force.y, finger2Force.y);
+  maxForce.y = max(maxForce.y, finger3Force.y);
 
-  max_force.z = max(finger1_force.z, finger2_force.z);
-  max_force.z = max(max_force.z, finger3_force.z);
+  maxForce.z = max(finger1Force.z, finger2Force.z);
+  maxForce.z = max(maxForce.z, finger3Force.z);
   */
-  max_force = finger1_force;
+  maxForce = finger1Force;
+  maxForce /= 100;
 
-  max_force.x = round(max_force.x/100);
-  max_force.y = round(max_force.y/100);
-  max_force.z = round(max_force.z/100);
-
-  return max_force;
+  return maxForce;
 }
 
-void resetGripper(byte duty_cycle){
+void resetGripper(byte dutyCycle){
   /*Reset servo position by centering pinion in rack.
   Servo finds lower gripper bound, then finds highest gripper bound and records travel time.
   Then rotates back half the time to find the center of the rack.
 
   :return: None
   */
-  servo.forward(duty_cycle);
+  servo.pwm(dutyCycle);
   while(digitalRead(11) == HIGH){
     //Wait until lower bound calibration button is pressed
   }
   unsigned long t0 = millis();
 
-  servo.backward(duty_cycle);
+  servo.pwm(-dutyCycle);
   while(digitalRead(12) == HIGH){
     //Wait until upper bound calibration button is pressed
   }
   unsigned long t1 = millis();
   unsigned long tc = round((t1 - t0)/2);
   
-  servo.forward(duty_cycle);
+  servo.pwm(dutyCycle);
   delay(tc);
-  servo.off();
+  servo.pwm(0);
 }
 
 void fullOpenGripper(){
-  servo.forward(255);
+  servo.pwm(255);
   while(digitalRead(11) == HIGH){
     //Wait until lower bound calibration button is pressed
   }
-  servo.backward(255);
+  servo.pwm(-255);
   delay(10);
-  servo.off();
+  servo.pwm(0);
 }
