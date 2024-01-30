@@ -5,11 +5,6 @@ PID::PID(int Kp, int Ki, int Kd){
   this->Kp = Kp;
   this->Ki = Ki;
   this->Kd = Kd;
-
-  init();
-}
-
-void PID::init(){
   startTime = millis();
   lastError = 0;
   cumulativeError = 0;
