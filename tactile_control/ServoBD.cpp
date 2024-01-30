@@ -4,42 +4,29 @@
 ServoBD::ServoBD(byte pinF, byte pinB){
   this->pin_f = pinF;
   this->pin_b = pinB;
-  init();
-}
-
-void ServoBD::init(){
   pinMode(pinF, OUTPUT);
   pinMode(pinB, OUTPUT);
-  off();
+  pwm(0);
 }
 
-void ServoBD::off(){
-  /*Turns the servo off by setting both forward and back signals to 0.
+void ServoBD::pwm(int dutyCycle){
+  /*Set servo to rotate at dutyCycle pwm until stopped
 
-  :return: None
-  */
-  analogWrite(pinF, 0);
-  analogWrite(pinB, 0);
-}
-
-void ServoBD::forward(uint8_t dutyCycle){
-  /*Set servo to forward rotation until stopped.
-
-  :param dutyCycle:  Duty cycle of servo signal. Value between 0 and 255
+  :param dutyCycle:  Duty cycle of servo signal. Value between -255 and 255
   :return:  None
   */
 
-  analogWrite(pinB, 0);
-  analogWrite(pinF, dutyCycle);
-}
-
-void ServoBD::backward(uint8_t dutyCycle){
-  /*Set servo to backward rotation until stopped.
-
-  :param dutyCycle:  Duty cycle of servo signal. Value between 0 and 255
-  :return    :  None
-  */
-
-  analogWrite(pinF, 0);
-  analogWrite(pinB, dutyCycle);
+  dutyCyle = (dutyCycle > 255) ? 255 : dutyCycle;
+  dutyCyle = (dutyCycle < -255) ? -255 : dutyCycle;
+  
+  if(dutyCycle > 0){
+    analogWrite(pinB, 0);
+    analogWrite(pinF, abs(dutyCycle));
+  }
+  else{
+    analogWrite(pinF, 0);
+    analogWrite(pinB, abs(dutyCycle));
+  }
+  
+  
 }
