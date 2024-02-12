@@ -1,10 +1,8 @@
-#include "HardwareSerial.h"
-#include "Arduino.h"
 #include "TactileSensor.h"
-#include "vector3.h"
+#include <HardwareSerial.h>
 
-TactileSensor::TactileSensor(byte mplxrPin){
-  this->mplxrPin = mplxrPin;
+TactileSensor::TactileSensor(byte t_multiplexer_pin){
+  m_multiplexer_pin = t_multiplexer_pin;
 }
 
 void TactileSensor::init(){  
@@ -13,39 +11,38 @@ void TactileSensor::init(){
   }
 }
 
-void TactileSensor::calibrate(int nSamples){
+void TactileSensor::calibrate(int t_number_of_samples){
   /*Call calibrate method in all 4 MLX90393 chips.
 
-  :param nSamples: Number of samples to be taken when calculating zero offset
-  :returns: None
+  :param t_number_of_samples: Number of samples to be taken when calculating zero offset
+  :return: None
   */
   Serial.print("Calibrated sensor chips: ");
   for(int i = 0; i < 4; i++){
     sensors[i].init();
-    sensors[i].calibrate(nSamples);
+    sensors[i].calibrate(t_number_of_samples);
     Serial.print(" ");
     Serial.print(i+1);
   }
-
   Serial.println();
 }
 
-vector3<long> TactileSensor::readData(){
+Vector3<long> TactileSensor::readData(){
   /*Read measurement data of the 4 attached MLX90393 chips.
   Calculate data average for X, Y, and Z measurements.
   Return averaged data vector.
 
-  :returns: averaged data vector
+  :return: averaged data vector
   */
-  vector3<long> readingAvg;
+  Vector3<long> reading_avg;
 
   for(int i = 0; i < 4; i++){
-    readingAvg += sensors[i].read();
+    reading_avg += sensors[i].read();
   }
 
-  return readingAvg / 4;
+  return reading_avg / 4;
 }
 
 String TactileSensor::str(){
-  return "ID:" + String(mplxrPin);
+  return "ID:" + String(m_multiplexer_pin);
 }

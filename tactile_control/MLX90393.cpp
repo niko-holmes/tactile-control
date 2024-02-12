@@ -1,56 +1,60 @@
-#include "HardwareSerial.h"
-#include "Arduino.h"
 #include "MLX90393.h"
-#include "vector3.h"
+#include <HardwareSerial.h>
 
-MLX90393::MLX90393(byte address){
-  this->address = address;
+
+#define SMXYZ 0x3E
+#define RMXYZ 0x4E
+#define EX 0x80
+#define RT 0xF0
+
+MLX90393::MLX90393(byte t_address){
+  m_address = t_address;
 }
 
 void MLX90393::init(){
-  zeroOffset *= 0;
+  m_zero_offset *= 0;
 }
 
-vector3<long> MLX90393::read(){
+Vector3<long> MLX90393::read(){
   /*Read sensor data. Must be called after calibrate() for accurate measurements.
 
   :return: vector of measured data in X,Y,Z axes.
   */
   byte readings[7];
 
-  Wire.beginTransmission(address);
-  Wire.write(0x3E); //SMxyz command
-  int c = Wire.endTransmission();
+  Wire.beginTransmission(m_address);
+  Wire.write(SMXYZ); //SMxyz command
+  int reply_bit = Wire.endTransmission();
 
-  if(c != 0){
+  if(reply_bit != 0){
     Serial.print("Read SMxyz Transmission Failed, error: ");
-    Serial.println(c);
+    Serial.println(reply_bit);
   }
 
-  Wire.requestFrom(address, byte(1));
+  Wire.requestFrom(m_address, byte(1));
 
   if(Wire.available() == 1){
-    byte statusByte = Wire.read();
+    byte status_byte = Wire.read();
 
     //Check for error bit in status byte
-    if(statusByte & 0b00010000){
+    if(status_byte & 0b00010000){
       Serial.print("Error in measure SMxyz");
     }
   }
 
   delay(15);
 
-  Wire.beginTransmission(address);
-  Wire.write(0x4E); //RMxyz command
-  c = Wire.endTransmission();
+  Wire.beginTransmission(m_address);
+  Wire.write(RMXYZ); //RMxyz command
+  reply_bit = Wire.endTransmission();
 
-  if(c != 0){
+  if(reply_bit != 0){
     Serial.print("Read RMxyz Transmission Failed, error: ");
-    Serial.println(c);
+    Serial.println(reply_bit);
   }
 
   //7 bytes: status, xMSB, xLSB, yMSB, yLSB, zMSB, zLSB
-  Wire.requestFrom(address, byte(7));
+  Wire.requestFrom(m_address, byte(7));
     
   if(Wire.available() == 7){
     for(int i = 0;  i < 7; i++){
@@ -63,29 +67,29 @@ vector3<long> MLX90393::read(){
     Serial.print("Error in measure RMxyz");
   }
 
-  vector3<long> data(((readings[1]<<8)|readings[2]),
-                    ((readings[3]<<8)|readings[4]),
-                    ((readings[5]<<8)|readings[6]));
+  Vector3<long> data(((readings[1]<<8)|readings[2]),
+                     ((readings[3]<<8)|readings[4]),
+                     ((readings[5]<<8)|readings[6]));
 
-  return data - zeroOffset; 
+  return data - m_zero_offset; 
 }
 
-void MLX90393::calibrate(int nSamples){
+void MLX90393::calibrate(int t_number_of_samples){
   /*Calibrate the sensor by taking the average of the first nSamples measured
   as the XYZ offsets.
 
-  :nSamples: Number of samples taken to find zero offset
+  :param t_number_of_samples: Number of samples taken to find zero offset
   :return  : None
   */
   init();
-  vector3<long> newOffset;
+  Vector3<long> new_offset;
   
-  for(int i=0; i < nSamples; i++){
-    vector3<long> d = read();
-    newOffset += d;
+  for(int i = 0; i < t_number_of_samples; i++){
+    Vector3<long> data = read();
+    new_offset += data;
   }
   
-  zeroOffset = (newOffset / nSamples);
+  m_zero_offset = (new_offset / t_number_of_samples);
 }
 
 void MLX90393::reset(){
@@ -94,32 +98,32 @@ void MLX90393::reset(){
   :return: None
   */
   //Initiate I2C communication and send EXIT then RESET command to sensor
-  Wire.beginTransmission(address);
-  Wire.write(0x80); //EX command
-  int c = Wire.endTransmission();
-  if(c != 0){
+  Wire.beginTransmission(m_address);
+  Wire.write(EX); //EX command
+  int reply_bit = Wire.endTransmission();
+  if(reply_bit != 0){
     Serial.print("EX Transmission Failed, error: ");
-    Serial.println(c);
+    Serial.println(reply_bit);
   }
 
   delay(1);
   
-  Wire.beginTransmission(address);
-  Wire.write(0xF0); //RT command
-  c = Wire.endTransmission();
+  Wire.beginTransmission(m_address);
+  Wire.write(RT); //RT command
+  reply_bit = Wire.endTransmission();
   
-  if(c != 0){
+  if(reply_bit != 0){
     Serial.print("RT Transmission Failed, error: ");
-    Serial.println(c);
+    Serial.println(reply_bit);
   }
 
   //Request status byte from sensor
-  Wire.requestFrom(address, byte(1));
+  Wire.requestFrom(m_address, byte(1));
 
   if(Wire.available() == 1){
-    byte statusByte = Wire.read();
+    byte status_byte = Wire.read();
     //Check for error bit in status byte
-    if(statusByte & 0b00010000){
+    if(status_byte & 0b00010000){
       Serial.print("Error in RT");
     }
   }
@@ -128,6 +132,6 @@ void MLX90393::reset(){
 }
 
 void MLX90393::print(){
-  Serial.println("Adr: " + String(address, BIN));
-  Serial.print("Offsets: " + zeroOffset.str());
+  Serial.println("Adr: " + String(m_address, BIN));
+  Serial.print("Offsets: " + m_zero_offset.str());
 }
