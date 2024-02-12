@@ -1,32 +1,29 @@
-#include "Arduino.h"
 #include "ServoBD.h"
 
-ServoBD::ServoBD(byte pinF, byte pinB){
-  this->pin_f = pinF;
-  this->pin_b = pinB;
-  pinMode(pinF, OUTPUT);
-  pinMode(pinB, OUTPUT);
+ServoBD::ServoBD(byte t_pin_f, byte t_pin_b){
+  m_pin_f = t_pin_f;
+  m_pin_b = t_pin_b;
+  pinMode(m_pin_f, OUTPUT);
+  pinMode(m_pin_b, OUTPUT);
   pwm(0);
 }
 
-void ServoBD::pwm(int dutyCycle){
+void ServoBD::pwm(int t_duty_cycle){
   /*Set servo to rotate at dutyCycle pwm until stopped
 
-  :param dutyCycle:  Duty cycle of servo signal. Value between -255 and 255
+  :param t_duty_cycle:  Duty cycle of servo signal. Value between -255 and 255
   :return:  None
   */
 
-  dutyCyle = (dutyCycle > 255) ? 255 : dutyCycle;
-  dutyCyle = (dutyCycle < -255) ? -255 : dutyCycle;
+  t_duty_cycle = (t_duty_cycle > 255) ? 255 : t_duty_cycle;
+  t_duty_cycle = (t_duty_cycle < -255) ? -255 : t_duty_cycle;
   
-  if(dutyCycle > 0){
-    analogWrite(pinB, 0);
-    analogWrite(pinF, abs(dutyCycle));
+  if(t_duty_cycle > 0){
+    analogWrite(m_pin_b, 0);
+    analogWrite(m_pin_f, abs(t_duty_cycle));
   }
   else{
-    analogWrite(pinF, 0);
-    analogWrite(pinB, abs(dutyCycle));
+    analogWrite(m_pin_f, 0);
+    analogWrite(m_pin_b, abs(t_duty_cycle));
   }
-  
-  
 }
